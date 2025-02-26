@@ -86,7 +86,7 @@ streamlit run app.py
 ```
 Open your browser and go to http://localhost:8501 to interact with the chatbot.
 ## Live Demo
-🔗 Hugging Face Space: [Insert Link Here]
+🔗 Hugging Face Space: https://huggingface.co/spaces/yujierachel/multi-agent-chatbot
 📂 GitHub Repository: https://github.com/YujieHan-Rachel/multi-agent-chatbot
 
 ## Customization & Enhancements

@@ -7,7 +7,7 @@ class Obnoxious_Agent:
     """Detects inappropriate content in user queries."""
 
     def __init__(self, client: openai.OpenAI, mode: str = "precise"):
-        self.client = client  
+        self.client = client
 
     def check_query(self, query: str) -> bool:
         """Checks if the query contains inappropriate content."""
