@@ -5,7 +5,7 @@ This chatbot efficiently handles user queries by orchestrating multiple AI agent
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 In this project, I built a chatbot that:
 
@@ -23,7 +23,7 @@ The system consists of multiple agents:
 
 ---
 
-## 🛠 Key Challenges & Solutions
+## Key Challenges & Solutions
 
 ### 1. Handling Irrelevant Questions
 ![Handling irrelevant questions](https://imgur.com/1bjnijr.png)  
@@ -43,7 +43,7 @@ The system consists of multiple agents:
 
 ---
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 ├── agents.py # Implements the multi-agent system 
 ├── app.py # Streamlit-based UI for chatbot 
@@ -54,7 +54,7 @@ The system consists of multiple agents:
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the Repository
 
@@ -80,22 +80,22 @@ export PINECONE_API_KEY="your-pinecone-api-key"
 ```
 (For Windows, use set instead of export.)
 
-## 🚀 Run the Chatbot
+## Run the Chatbot
 ```bash
 streamlit run app.py
 ```
 Open your browser and go to http://localhost:8501 to interact with the chatbot.
-## 🌍 Live Demo
+## Live Demo
 🔗 Hugging Face Space: [Insert Link Here]
 📂 GitHub Repository: https://github.com/YujieHan-Rachel/multi-agent-chatbot
 
-## 🎯 Customization & Enhancements
+## Customization & Enhancements
 If you want to modify the chatbot behavior:
 
 Optimize Retrieval: Modify Query_Agent in agents.py for better search results.
 Enhance Response Quality: Experiment with prompt engineering in Answering_Agent.
 Improve Document Filtering: Adjust ranking logic in Relevance_Agent.
-## 🤝 Contributing
+## Contributing
 Pull requests are welcome! If you find a bug or want to suggest improvements:
 
 Fork the repo
@@ -103,16 +103,16 @@ Create a new branch (git checkout -b feature-new-feature)
 Commit your changes (git commit -m "Added new feature")
 Push to your branch (git push origin feature-new-feature)
 Open a Pull Request
-## 📜 License
+## License
 This project is licensed under the MIT License. Feel free to use and modify!
 
-## 📬 Contact
+## Contact
 For questions or collaboration, reach out at:
 
 Email: [yujierachel@gmail.com]
 LinkedIn: [[LinkedIn Profile](https://www.linkedin.com/in/yujie-rachel-han/)]
 
-## ✅ Final Notes
+## Final Notes
 - This project showcases a scalable, modular AI chatbot with efficient knowledge retrieval.
 - Ideal for AI-driven information retrieval, Q&A systems, and interactive chatbots.
 - Can be expanded to support domain-specific datasets or company knowledge bases.
