@@ -1,15 +1,13 @@
 import openai
-import pinecone
 import logging
 from typing import List, Dict
 
 
-# Initialize OpenAI and Pinecone clients
 class Obnoxious_Agent:
     """Detects inappropriate content in user queries."""
 
     def __init__(self, client: openai.OpenAI, mode: str = "precise"):
-        self.client = client  # OpenAI client
+        self.client = client  
 
     def check_query(self, query: str) -> bool:
         """Checks if the query contains inappropriate content."""
@@ -42,12 +40,12 @@ class Query_Agent:
             )
             embedding = response.data[0].embedding
 
-            results = self.index.query(vector=embedding, top_k=k, include_metadata=True)
+            results = self.index.query(vector=embedding, top_k=k, include_values=True, include_metadata=True)
 
-            if results and results.matches:
+            if results and results.get("matches"):
                 return [
-                    {"text": match.metadata["text"], "score": match.score}
-                    for match in results.matches
+                    {"text": match["metadata"]["text"], "score": match["score"]}
+                    for match in results["matches"]
                 ]
             return []
         except Exception as e:
@@ -84,18 +82,19 @@ class Answering_Agent:
     """Generates responses to the user's query using OpenAI."""
 
     def __init__(self, openai_client: openai.OpenAI):
-        self.client = openai_client  # OpenAI client
+        self.client = openai_client
 
-    def generate_response(self, query: str, docs: List[Dict]) -> str:
-        """Generates a response directly using OpenAI."""
+    def generate_response(self, query: str, docs: List[Dict], conv_history: List[Dict]) -> str:
+        """Generates a response directly using OpenAI, maintaining conversation history."""
         if not docs:
-            # Directly generate an explanation using OpenAI if no documents are found
-            return self.fallback_to_openai(query)
+            return self.fallback_to_openai(query, conv_history)
 
         context = "\n\n".join([f"Document {i + 1}: {doc['text']}" for i, doc in enumerate(docs)])
 
-        messages = [{"role": "system", "content": "Use the following context to answer the user's question."}]
-        messages.append({"role": "user", "content": f"Question: {query}\nContext:\n{context}"})
+        messages = conv_history + [
+            {"role": "system", "content": "Use the following context to answer the user's question."},
+            {"role": "user", "content": f"Question: {query}\nContext:\n{context}"}
+        ]
 
         try:
             response = self.client.chat.completions.create(
@@ -108,12 +107,13 @@ class Answering_Agent:
         except Exception as e:
             return f"Failed to generate response: {str(e)}"
 
-    def fallback_to_openai(self, query: str) -> str:
+    def fallback_to_openai(self, query: str, conv_history: List[Dict]) -> str:
         """Fallback to OpenAI to generate an explanation when no relevant documents are found."""
         try:
+            messages = conv_history + [{"role": "user", "content": query}]
             response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": query}],
+                messages=messages,
                 temperature=0.5,
                 max_tokens=200
             )
@@ -128,7 +128,6 @@ class Head_Agent:
     def __init__(self, openai_client: openai.OpenAI, pinecone_index, mode: str = "precise"):
         self.client = openai_client
         self.index = pinecone_index
-        self.mode = mode
         self.conv_history = []
 
         self.obnoxious_agent = Obnoxious_Agent(self.client, mode)
@@ -141,21 +140,15 @@ class Head_Agent:
         if self.obnoxious_agent.check_query(query):
             return "Sorry, I cannot answer inappropriate questions."
 
-        # Check if it's the second question and use the previous context
-        if len(self.conv_history) > 0 and 'logistic regression' in self.conv_history[-1]['content'].lower():
-            query = "Logistic regression: " + query  # Modify query to ensure context is clear
-
-        # Retrieve relevant documents
         docs = self.query_agent.query_vector_store(query)
+
         if not docs:
-            return "No relevant documents found."
+            response = self.answering_agent.fallback_to_openai(query, self.conv_history)
+        else:
+            valid_docs = self.doc_agent.get_relevance(query, docs)
+            response = self.answering_agent.generate_response(query, valid_docs, self.conv_history)
 
-        valid_docs = self.doc_agent.get_relevance(query, docs)
-        response = self.answering_agent.generate_response(query, valid_docs)
-
-        # Add the user and assistant messages to the conversation history
         self.conv_history.append({"role": "user", "content": query})
         self.conv_history.append({"role": "assistant", "content": response})
 
         return response
-
