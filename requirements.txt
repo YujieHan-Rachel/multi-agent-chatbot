@@ -1,5 +1,7 @@
 streamlit
 openai
 pinecone
-requests
-tqdm
+langchain
+langchain-community
+pymupdf
+pandas
